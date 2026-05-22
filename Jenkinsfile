@@ -37,21 +37,6 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-
-            steps {
-
-                sh 'sonar-scanner'
-            }
-        }
-
-        stage('Trivy Scan') {
-
-            steps {
-
-                sh 'trivy image docker.io/atuljkamble/cloudnativeapp:v1'
-            }
-        }
 
         stage('Push to Docker Hub') {
 
