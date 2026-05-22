@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: flaskapp
+  namespace: production
+
+spec:
+
+  replicas: 3
+
+  selector:
+
+    matchLabels:
+      app: flaskapp
+
+  template:
+
+    metadata:
+
+      labels:
+        app: flaskapp
+
+    spec:
+
+      containers:
+
+      - name: flaskapp
+
+        image: docker.io/atuljkamble/cloudnativeapp:v1
+
+        ports:
+
+        - containerPort: 5000
+
+        resources:
+
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+        livenessProbe:
+
+          httpGet:
+            path: /health
+            port: 5000
+
+          initialDelaySeconds: 10
+
+        readinessProbe:
+
+          httpGet:
+            path: /health
+            port: 5000
