@@ -4,11 +4,11 @@ pipeline {
 
     environment {
 
-        AWS_REGION = "us-east-1"
+        IMAGE_NAME = "cloudnativeapp"
 
-        IMAGE_NAME = "flaskapp"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
 
-        ACCOUNT_ID = credentials('aws-account-id')
+        DOCKERHUB_USERNAME = "atuljkamble"
     }
 
     stages {
@@ -17,7 +17,7 @@ pipeline {
 
             steps {
 
-                git 'https://github.com/username/repo.git'
+                git branch: 'dev', url: 'https://github.com/atulkamble/cloudnative-aws-devops-platform.git'
             }
         }
 
@@ -25,7 +25,7 @@ pipeline {
 
             steps {
 
-                sh 'docker build -t flaskapp:v1 .'
+                sh 'docker build -t $IMAGE_NAME:v1 .'
             }
         }
 
@@ -49,43 +49,57 @@ pipeline {
 
             steps {
 
-                sh 'trivy image flaskapp:v1'
+                sh 'trivy image docker.io/atuljkamble/cloudnativeapp:v1'
             }
         }
 
-        stage('Push to ECR') {
+        stage('Push to Docker Hub') {
 
             steps {
 
                 sh '''
-                aws ecr get-login-password \
-                --region us-east-1 | \
+                echo $DOCKERHUB_CREDENTIALS_PSW | \
                 docker login \
-                --username AWS \
-                --password-stdin \
-                $ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
+                --username $DOCKERHUB_CREDENTIALS_USR \
+                --password-stdin
                 '''
 
                 sh '''
-                docker tag flaskapp:v1 \
-                $ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/flaskapp:v1
+                docker tag $IMAGE_NAME:v1 \
+                $DOCKERHUB_USERNAME/$IMAGE_NAME:v1
                 '''
 
                 sh '''
                 docker push \
-                $ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/flaskapp:v1
+                $DOCKERHUB_USERNAME/$IMAGE_NAME:v1
                 '''
+            }
+
+            post {
+
+                always {
+
+                    sh 'docker logout'
+                }
             }
         }
 
-        stage('Deploy to EKS') {
+        stage('Run Container') {
 
             steps {
 
                 sh '''
-                kubectl apply -f kubernetes/
+                docker stop $IMAGE_NAME || true
+                docker rm $IMAGE_NAME || true
+                docker run -d \
+                --name $IMAGE_NAME \
+                --restart unless-stopped \
+                -p 5000:5000 \
+                $DOCKERHUB_USERNAME/$IMAGE_NAME:v1
                 '''
             }
         }
+
+
     }
 }
