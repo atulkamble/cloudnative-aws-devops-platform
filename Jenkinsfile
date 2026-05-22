@@ -33,7 +33,7 @@ pipeline {
 
             steps {
 
-                sh 'pytest app/'
+                sh 'docker run --rm $IMAGE_NAME:v1 pytest'
             }
         }
 
