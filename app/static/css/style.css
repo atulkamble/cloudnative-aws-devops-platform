@@ -1,0 +1,57 @@
+body {
+
+    background-color: #f5f7fb;
+
+    font-family: Arial;
+}
+
+.hero-section {
+
+    background: linear-gradient(
+        135deg,
+        #0f172a,
+        #1e293b
+    );
+
+    color: white;
+
+    padding: 100px 0;
+}
+
+.hero-image {
+
+    width: 300px;
+
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.dashboard-card {
+
+    border-radius: 15px;
+
+    padding: 20px;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+
+    transition: 0.3s;
+}
+
+.dashboard-card:hover {
+
+    transform: translateY(-5px);
+}
