@@ -16,7 +16,7 @@ resource "local_file" "private_key" {
 }
 
 resource "aws_key_pair" "jenkins_key" {
-  key_name   = "jenkins"
+  key_name   = "jenkins-1"
   public_key = tls_private_key.jenkins.public_key_openssh
 }
 
